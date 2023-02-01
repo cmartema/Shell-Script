@@ -11,7 +11,7 @@ readonly JunkPath="$HOME/junk"
 #Initialiazing variable basename to use in here document.
 ScriptName="$(basename "$0")"
 
-#function for when no arguments are specefied or if -h is provided using here-document.
+#function for when no arguments are specified or if -h is provided using here-document.
 HELP_Func() {
 	cat << HELPTEXT
 Usage: $ScriptName [-hlp] [list of files]
@@ -23,22 +23,16 @@ Usage: $ScriptName [-hlp] [list of files]
 HELPTEXT
 }
 
-#
-if [ $# -eq 0 ]; then
-	HELP_Func
-	exit 0
-fi
-
 #Using variables as booleans.
+help_flag=0
 list_flag=0
 purge_flag=0
 
 #Parses the command line arguments.
-while getopts "hlp" option; do
+while getopts ":hlp" option; do
 	case "$option" in
 		h) 	
-			HELP_Func
-			exit 0
+			help_flag=1 
 		       	;;
 		l)
 			list_flag=1
@@ -47,7 +41,7 @@ while getopts "hlp" option; do
 			purge_flag=1
 			;;
 		?)
-			echo "Error: Unknown option '-$OPTARG'."
+			echo "Error: Unknown option '-$OPTARG'." >&2
 			HELP_Func 
 			exit 1
 			;;
@@ -55,10 +49,16 @@ while getopts "hlp" option; do
 done
 
 #In case if more than one (valid) flag is specified (Compares two bools).
-if [ "$list_flag" == 1 ] && [ "$purge_flag" == 1 ]; then
-	echo "Error: Too many options enabled."
+if [ $(( help_flag + list_flag + purge_flag)) -gt 1 ]; then
+	echo "Error: Too many options enabled." >&2
 	HELP_Func
 	exit 1
+fi
+
+
+if [ $# -eq 0 ]; then
+	 HELP_Func
+	 exit 0
 fi
 
 #shifting the arguments (Read Search,sh)
@@ -66,9 +66,9 @@ shift "$((OPTIND-1))"
 
 #In case any flags are specified with files (Compares two bools).
 #There should be only 1 argument remaining.
-if [ "$list_flag" == 1 ] || [ "$purge_flag" == 1 ]; then
+if [ "$list_flag" == 1 ] || [ "$purge_flag" == 1 ] || [ "$help_flag" == 1 ]; then
 	if [ $# -gt 1 ]; then
-		echo "Error: Too many options enabled."
+		echo "Error: Too many options enabled." >&2
 		HELP_Func
 		exit 1
 	fi
@@ -91,6 +91,12 @@ for FILE in "$@"; do
 		echo "Warning: '$FILE' not found"
 	fi
 done
+
+
+if [ "$help_flag" == 1 ]; then
+       HELP_FUNC
+       exit 1
+fi       
 
 #Lists all of the junked files
 if [ "$list_flag" == 1 ]; then
