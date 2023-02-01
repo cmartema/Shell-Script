@@ -55,7 +55,7 @@ while getopts "hlp" option; do
 done
 
 #In case if more than one (valid) flag is specified (Compares two bools).
-if [ "$list_flag" == 1 ] && ["$purge_flag" == 1 ]; then
+if [ "$list_flag" == 1 ] && [ "$purge_flag" == 1 ]; then
 	echo "Error: Too many options enabled."
 	HELP_Func
 	exit 1
@@ -92,6 +92,16 @@ for FILE in "$@"; do
 	fi
 done
 
+#Lists all of the junked files
+if [ "$list_flag" == 1 ]; then
+	ls -lAF "$JunkPath"
+	exit 0
+fi
+
+#Purges junked files
+if [ "$purge_flag" == 1 ]; then
+	rm -rf "$JunkPath"
+	exit 0
+fi
+
 exit 0
-
-
