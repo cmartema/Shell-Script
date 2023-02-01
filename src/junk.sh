@@ -55,7 +55,7 @@ if [ $(( help_flag + list_flag + purge_flag)) -gt 1 ]; then
 	exit 1
 fi
 
-
+#in case no argument is given.
 if [ $# -eq 0 ]; then
 	 HELP_Func
 	 exit 0
@@ -92,7 +92,7 @@ for FILE in "$@"; do
 	fi
 done
 
-
+#Help guide is provided using here-text.
 if [ "$help_flag" == 1 ]; then
        HELP_FUNC
        exit 1
